@@ -5,6 +5,8 @@ const { User } = require("../../models/user.js");
 const { mongoose } = require("../../db/mongoose.js");
 const { changeBalance, isEnoughBalance } = require("./usersFunctions.js");
 
+const ethereumId = process.env.ETH || "5c27d33959afef244046c372";
+
 router.get("/", (req, res) => {
   res.send("tez dziala");
 });
@@ -22,11 +24,11 @@ router.get("/add", (req, res) => {
 router.post("/register", (req, res) => {
   const body = _.pick(req.body, ["email", "password"]);
   const user = new User(body);
-
+  console.log(req.body);
   user
     .save()
     .then(() => {
-      res.send("Dodano uzytkownika");
+      res.json({ message: "Dodano uzytkownika" });
     })
     .catch(err => {
       console.log(err);
@@ -39,20 +41,24 @@ router.post("/login", async (req, res) => {
   try {
     const user = await User.findByCredentials(body.email, body.password);
     const token = await user.generateAuthToken();
-    res.header("x-auth", token).json(user);
+    const result = {
+      token: token,
+      email: user.email
+    };
+    res.json(result);
   } catch (err) {
+    console.log(err);
     res.status(401).json({ error: err });
   }
 });
 
 router.patch("/addEthAddress", async (req, res) => {
   try {
-    console.log(req.headers["x-auth"]);
+    console.log(req.body.token);
     const name = req.body.name;
     const address = req.body.address;
-    const user = await User.findByToken(req.headers["x-auth"]);
+    const user = await User.findByToken(req.body.token);
     if (!user) {
-      console.log("what");
       throw new Error();
     }
 
@@ -67,9 +73,7 @@ router.patch("/addEthAddress", async (req, res) => {
 
 router.post("/addBalance", async (req, res) => {
   try {
-    const user = await User.findByToken(
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YzI3YzU3ZmQ5Y2M4NzI2MGNjYTc1MzYiLCJhY2Nlc3MiOiJhdXRoIiwiaWF0IjoxNTQ2MTEwMzQ0fQ.f0351QVWEseI251XMhptigy50f3Y7XlT9BDw0GQ1OCg"
-    );
+    const user = await User.findByToken(req.body.token);
     user.cryptocurrencies.push({
       cryptocurrency: req.body.cryptocurrency_id,
       balance: req.body.balance
@@ -83,7 +87,7 @@ router.post("/addBalance", async (req, res) => {
 
 router.get("/getBalances", async (req, res) => {
   try {
-    const user = await User.findByToken(req.headers["x-auth"]);
+    const user = await User.findByToken(req.body.token);
     if (!user) {
       throw new Error("user.not_found");
     }
@@ -116,10 +120,10 @@ router.get("/getBalances", async (req, res) => {
 
 router.patch("/changeBalance", async (req, res) => {
   //onlyOne(boolean), cryptocurrencies [(objectId)], balances[number],
-  const cryptocurrency_id = "5c27d33959afef244046c372";
-  const value = -120;
+  const cryptocurrency_id = req.body.cryptocurrency_id;
+  const value = req.body.value;
   try {
-    const user = await User.findByToken(req.headers["x-auth"]);
+    const user = await User.findByToken(req.body.token);
     if (!user) {
       throw new Error("user.not_found");
     }

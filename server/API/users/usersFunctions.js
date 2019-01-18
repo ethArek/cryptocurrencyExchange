@@ -9,7 +9,8 @@ const changeBalance = async (user, cryptocurrency_id, value) => {
     let flag = false;
     for (let cryptocurrency of user.cryptocurrencies) {
       if (cryptocurrency.cryptocurrency == cryptocurrency_id) {
-        cryptocurrency.balance += value;
+        cryptocurrency.fullBalance += value;
+        cryptocurrency.availableBalance += value;
         flag = true;
         break;
       }
@@ -18,7 +19,8 @@ const changeBalance = async (user, cryptocurrency_id, value) => {
     if (!flag) {
       user.cryptocurrencies.push({
         cryptocurrency: cryptocurrency_id,
-        balance: value
+        fullBalance: value,
+        availableBalance: value
       });
     }
     await user.save();
@@ -37,12 +39,46 @@ const isEnoughBalance = (user, cryptocurrency_id, value) => {
 
   for (let cryptocurrency of user.cryptocurrencies) {
     if (cryptocurrency.cryptocurrency == cryptocurrency_id) {
-      if (cryptocurrency.balance + value > 0) {
+      if (cryptocurrency.availableBalance + value > 0) {
         return true;
       } else {
         return false;
       }
     }
+  }
+};
+
+const changeAvailableBalance = async (user, cryptocurrency_id, value) => {
+  try {
+    for (let cryptocurrency of user.cryptocurrencies) {
+      if (cryptocurrency.cryptocurrency == cryptocurrency_id) {
+        cryptocurrency.availableBalance += value;
+        break;
+      }
+    }
+
+    await user.save();
+    return "user.avilable_balance_change.success";
+  } catch (err) {
+    console.log(err);
+    return "user.available_balance_change.fail";
+  }
+};
+
+const changeFullBalance = async (user, cryptocurrency_id, value) => {
+  try {
+    for (let cryptocurrency of user.cryptocurrencies) {
+      if (cryptocurrency.cryptocurrency == cryptocurrency_id) {
+        cryptocurrency.availableBalance += value;
+        break;
+      }
+    }
+
+    await user.save();
+    return "user.avilable_balance_change.success";
+  } catch (err) {
+    console.log(err);
+    return "user.available_balance_change.fail";
   }
 };
 
