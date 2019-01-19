@@ -21,4 +21,14 @@ router.post("/add", async (req, res) => {
   }
 });
 
+router.get("/getCryptocurrencies", async (req, res) => {
+  try {
+    const cryptocurrencies = await CryptoCurrency.find();
+    res.json(cryptocurrencies);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: err });
+  }
+});
+
 module.exports = router;

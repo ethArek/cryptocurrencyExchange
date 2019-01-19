@@ -13,6 +13,9 @@ const CryptoCurrencySchema = new mongoose.Schema({
   ticker: {
     type: String,
     required: true
+  },
+  lastPrice: {
+    type: Number
   }
 });
 const CryptoCurrency = mongoose.model("cryptocurrencies", CryptoCurrencySchema);

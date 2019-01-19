@@ -24,7 +24,7 @@ const OrderSchema = new mongoose.Schema({
   },
   closed: [
     {
-      value: {
+      amount: {
         type: Number,
         required: true
       },
@@ -34,7 +34,11 @@ const OrderSchema = new mongoose.Schema({
       }
     }
   ],
-  value: {
+  amount: {
+    type: Number,
+    required: true
+  },
+  price: {
     type: Number,
     required: true
   },

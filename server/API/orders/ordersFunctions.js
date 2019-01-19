@@ -17,3 +17,7 @@ const getRemainingAmount = async order_id => {
     console.log(err);
   }
 };
+
+module.exports = {
+  getRemainingAmount
+};

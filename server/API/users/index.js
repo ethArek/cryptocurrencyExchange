@@ -72,22 +72,34 @@ router.patch("/addEthAddress", async (req, res) => {
 });
 
 router.post("/addBalance", async (req, res) => {
+  console.log(req);
+  console.log("bla");
   try {
     const user = await User.findByToken(req.body.token);
+    console.log("blaaa");
+    if (!user) {
+      console.log("user.not_found");
+    }
+    console.log("kuzwa" + user);
     user.cryptocurrencies.push({
       cryptocurrency: req.body.cryptocurrency_id,
-      balance: req.body.balance
+      availableBalance: req.body.balance,
+      fullBalance: req.body.balance
     });
+    console.log(user.cryptocurrencies);
+    console.log("bla");
     await user.save();
-    res.json("success");
+    res.json({ message: "success" });
   } catch (err) {
+    console.log(err);
     res.json({ message: "fail", error: err });
   }
 });
 
 router.get("/getBalances", async (req, res) => {
+  console.log("token" + req.query.token);
   try {
-    const user = await User.findByToken(req.body.token);
+    const user = await User.findByToken(req.query.token);
     if (!user) {
       throw new Error("user.not_found");
     }
@@ -101,9 +113,8 @@ router.get("/getBalances", async (req, res) => {
           console.log(cryptocurrency.name);
           result.push({
             cryptocurrency_id: cryptocurrency.cryptocurrency._id,
-            cryptocurrency_name: cryptocurrency.cryptocurrency.name,
-            cryptocurrency_ticker: cryptocurrency.cryptocurrency.ticker,
-            balance: cryptocurrency.balance
+            availableBalance: cryptocurrency.availableBalance,
+            fullBalance: cryptocurrency.fullBalance
           });
         });
         res.json(result);

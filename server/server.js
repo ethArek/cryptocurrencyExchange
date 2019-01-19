@@ -7,6 +7,8 @@ const { mongoose } = require("./db/mongoose.js");
 const app = express();
 const { User } = require("./models/user.js");
 
+require("dotenv").config();
+
 const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
