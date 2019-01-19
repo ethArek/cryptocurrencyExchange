@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const _ = require("lodash");
 
 const { User } = require("../../models/user.js");
 const { Order } = require("../../models/orders.js");
@@ -101,8 +102,16 @@ router.post("/takeOrder", async (req, res) => {
 
   try {
     const order = await Order.findById(body.order_id);
-    let taker = await User.findByToken(body.token);
-    let maker = await User.findById(order.user_id);
+    let maker, taker;
+
+    if (order.isBuyOrder) {
+      taker = await User.findByToken(body.token);
+      maker = await User.findById(order.user_id);
+    } else {
+      maker = await User.findByToken(body.token);
+      taker = await User.findById(order.user_id);
+    }
+
     console.log(body.token);
 
     let remainingAmount = await getRemainingAmount(body.order_id);
@@ -174,6 +183,12 @@ router.post("/takeOrder", async (req, res) => {
         };
 
         const transaction = new Transaction(transactionBody);
+        const cryptocurrency = await CryptoCurrency.findOne({
+          _id: order.cryptocurrency_id
+        });
+
+        cryptocurrency.lastPrice = order.price;
+        await cryptocurrency.save();
 
         await order.save();
         await taker.save();
