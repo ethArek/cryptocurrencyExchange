@@ -7,6 +7,8 @@ router.use(
   "/administration/cryptocurrencies",
   require("./administration/cryptocurrencies/index.js")
 );
+router.use("/orders", require("./orders/index.js"));
+router.use("/transactions", require("./transactions/index.js"));
 
 router.get("/", (req, res) => {
   res.send("spoczko");

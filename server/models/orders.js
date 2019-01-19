@@ -19,7 +19,6 @@ const OrderSchema = new mongoose.Schema({
   },
   openedAt: {
     type: Date,
-    default: new Date(),
     required: true
   },
   closed: [
@@ -29,8 +28,7 @@ const OrderSchema = new mongoose.Schema({
         required: true
       },
       date: {
-        type: Date,
-        default: new Date()
+        type: Date
       }
     }
   ],

@@ -33,7 +33,6 @@ const changeBalance = async (user, cryptocurrency_id, value) => {
 
 const isEnoughBalance = (user, cryptocurrency_id, value) => {
   if (value > 0) {
-    console.log("what");
     return true;
   }
 
@@ -51,13 +50,12 @@ const isEnoughBalance = (user, cryptocurrency_id, value) => {
 const changeAvailableBalance = async (user, cryptocurrency_id, value) => {
   try {
     for (let cryptocurrency of user.cryptocurrencies) {
-      if (cryptocurrency.cryptocurrency == cryptocurrency_id) {
+      if (cryptocurrency.cryptocurrency == cryptocurrency_id.toString()) {
         cryptocurrency.availableBalance += value;
-        break;
       }
     }
 
-    await user.save();
+    return user;
     return "user.avilable_balance_change.success";
   } catch (err) {
     console.log(err);
@@ -66,16 +64,15 @@ const changeAvailableBalance = async (user, cryptocurrency_id, value) => {
 };
 
 const changeFullBalance = async (user, cryptocurrency_id, value) => {
+  //console.log(cryptocurrency_id + "            " + "gdsadgasdgasdgasdgadsga");
   try {
     for (let cryptocurrency of user.cryptocurrencies) {
-      if (cryptocurrency.cryptocurrency == cryptocurrency_id) {
-        cryptocurrency.availableBalance += value;
-        break;
+      if (cryptocurrency.cryptocurrency == cryptocurrency_id.toString()) {
+        cryptocurrency.fullBalance += value;
       }
     }
 
-    await user.save();
-    return "user.avilable_balance_change.success";
+    return user;
   } catch (err) {
     console.log(err);
     return "user.available_balance_change.fail";
@@ -83,6 +80,7 @@ const changeFullBalance = async (user, cryptocurrency_id, value) => {
 };
 
 module.exports = {
-  changeBalance,
+  changeAvailableBalance,
+  changeFullBalance,
   isEnoughBalance
 };
