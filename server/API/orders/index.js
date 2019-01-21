@@ -24,6 +24,14 @@ router.post("/getOrders", async (req, res) => {
       cryptocurrency_id: req.body.cryptocurrency_id
     });
 
+    for (const buyOrder of buyOrders) {
+      buyOrder.amount = getRemainingAmount(buyOrder);
+    }
+
+    for (const sellOrder of sellOrders) {
+      sellOrder.amount = getRemainingAmount(sellOrder);
+    }
+
     const result = {
       buyOrders,
       sellOrders
@@ -70,10 +78,12 @@ router.post("/placeOrder", async (req, res) => {
       orderValue = body.price * body.amount;
     } else {
       orderValue = body.amount;
+      tempCryptocurrency = body.cryptocurrency_id;
     }
     console.log(orderValue);
 
     if (isEnoughBalance(user, body.cryptocurrency_id, orderValue * -1)) {
+      console.log("tutaj jestem");
       const orderBody = {
         cryptocurrency_id: tempCryptocurrency,
         user_id: user._id,
@@ -87,7 +97,12 @@ router.post("/placeOrder", async (req, res) => {
       orderValue *= -1;
       await changeAvailableBalance(user, body.cryptocurrency_id, orderValue);
 
-      res.json("order.place.success");
+      const result = {
+        user_id: user._id,
+        _id: order._id,
+        message: "order.place.success"
+      };
+      res.json(result);
     } else {
       throw new Error("order.crypto.not_enough");
     }
@@ -114,7 +129,7 @@ router.post("/takeOrder", async (req, res) => {
 
     console.log(body.token);
 
-    let remainingAmount = await getRemainingAmount(body.order_id);
+    let remainingAmount = getRemainingAmount(order);
     const valueTaker = req.body.amount * order.price * -1;
     const hasTakerEnoughBalance = await isEnoughBalance(
       taker,

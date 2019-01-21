@@ -32,6 +32,7 @@ const changeBalance = async (user, cryptocurrency_id, value) => {
 };
 
 const isEnoughBalance = (user, cryptocurrency_id, value) => {
+  console.log("VALUE: " + value);
   if (value > 0) {
     return true;
   }
